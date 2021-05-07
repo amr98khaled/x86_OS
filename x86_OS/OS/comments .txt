@@ -1,0 +1,16 @@
+http://www.jamesmolloy.co.uk/tutorial_html/3.-The%20Screen.html
+
+Moving the cursor:
+To move the hardware cursor, we must firstly work out the linear offset of the x,y cursor coordinate. We do this by using the equation above. Next, we have to send this offset to the VGA controller. 
+For some reason, it accepts the 16-bit location as two bytes. We send the controller's command port (0x3D4) the command 14 to tell it we are sending the high byte, then send that byte to port 0x3D5.
+We then repeat with the low byte, but send the command 15 instead.
+// Updates the hardware cursor.
+static void move_cursor()
+{
+   // The screen is 80 characters wide...
+   u16int cursorLocation = cursor_y * 80 + cursor_x;
+   outb(0x3D4, 14);                  // Tell the VGA board we are setting the high cursor byte.
+   outb(0x3D5, cursorLocation >> 8); // Send the high cursor byte.
+   outb(0x3D4, 15);                  // Tell the VGA board we are setting the low cursor byte.
+   outb(0x3D5, cursorLocation);      // Send the low cursor byte.
+}
